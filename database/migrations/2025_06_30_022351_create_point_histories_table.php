@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->comment('사용자 ID');
             
             // 포인트 관련 객체 (다형적 관계)
-            $table->morphs('pointable', 'point_histories_pointable_index');
+            $table->nullableMorphs('pointable', 'point_histories_pointable_index');
             
             // 포인트 변동 정보
             $table->integer('points')->comment('포인트 (양수: 적립, 음수: 차감)');
@@ -46,7 +46,7 @@ return new class extends Migration
             $table->text('admin_memo')->nullable()->comment('관리자 메모');
             
             // 관리자 정보 (관리자가 직접 조정한 경우)
-            $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('set null')->comment('처리한 관리자 ID');
+            $table->foreignId('admin_id')->nullable()->constrained('users')->onDelete('set null')->comment('처리한 관리자 ID');
             
             // 유효기간 (포인트 만료 관련)
             $table->date('expires_at')->nullable()->comment('포인트 만료일');
