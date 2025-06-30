@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Blade 컴포넌트 등록
+        \Illuminate\Support\Facades\Blade::componentNamespace('App\\View\\Components\\Ahhob', 'ahhob');
     }
 }
