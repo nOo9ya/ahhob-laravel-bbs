@@ -52,8 +52,8 @@ check_requirements() {
         exit 1
     fi
     
-    # Docker Compose 설치 확인
-    if ! command -v docker-compose &> /dev/null; then
+    # Docker Compose 설치 확인 (플러그인 또는 standalone)
+    if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
         log_error "Docker Compose가 설치되어 있지 않습니다."
         exit 1
     fi
@@ -100,7 +100,7 @@ stop_application() {
     log_info "기존 애플리케이션 중지 중..."
     
     if [ -f "docker-compose.prod.yml" ]; then
-        docker-compose -f docker-compose.prod.yml down --remove-orphans
+        docker compose -f docker-compose.prod.yml down --remove-orphans
         log_success "애플리케이션이 중지되었습니다."
     else
         log_warning "docker-compose.prod.yml 파일이 없습니다."
@@ -163,17 +163,17 @@ build_and_start() {
     log_info "애플리케이션 빌드 및 시작 중..."
     
     # Docker 이미지 빌드
-    docker-compose -f docker-compose.prod.yml build --no-cache
+    docker compose -f docker-compose.prod.yml build --no-cache
     log_success "Docker 이미지가 빌드되었습니다."
     
     # 컨테이너 시작
-    docker-compose -f docker-compose.prod.yml up -d
+    docker compose -f docker-compose.prod.yml up -d
     log_success "컨테이너가 시작되었습니다."
     
     # 컨테이너 상태 확인
     sleep 10
     log_info "컨테이너 상태 확인 중..."
-    docker-compose -f docker-compose.prod.yml ps
+    docker compose -f docker-compose.prod.yml ps
 }
 
 # 애플리케이션 초기화
@@ -286,9 +286,9 @@ show_deployment_info() {
     echo "- 모니터링: http://localhost:3000 (Grafana)"
     echo ""
     echo "유용한 명령어:"
-    echo "- 로그 확인: docker-compose -f docker-compose.prod.yml logs -f"
-    echo "- 컨테이너 상태: docker-compose -f docker-compose.prod.yml ps"
-    echo "- 애플리케이션 재시작: docker-compose -f docker-compose.prod.yml restart app"
+    echo "- 로그 확인: docker compose -f docker-compose.prod.yml logs -f"
+    echo "- 컨테이너 상태: docker compose -f docker-compose.prod.yml ps"
+    echo "- 애플리케이션 재시작: docker compose -f docker-compose.prod.yml restart app"
     echo "- 성능 최적화: docker exec ahhob-app php artisan ahhob:optimize"
 }
 
@@ -296,7 +296,7 @@ show_deployment_info() {
 handle_error() {
     log_error "배포 중 오류가 발생했습니다!"
     log_info "롤백을 수행하려면 다음 명령을 실행하세요:"
-    echo "docker-compose -f docker-compose.prod.yml down"
+    echo "docker compose -f docker-compose.prod.yml down"
     echo "# 백업에서 복원..."
     exit 1
 }

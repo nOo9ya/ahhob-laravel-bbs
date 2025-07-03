@@ -1,0 +1,57 @@
+# Laravel 개발 파일
+.env*
+!.env.production
+.git
+.gitignore
+.gitattributes
+
+# 의존성 디렉토리 (멀티 스테이지에서 별도 처리)
+node_modules
+vendor
+
+# 빌드 결과물 (멀티 스테이지에서 별도 처리)
+public/build
+public/hot
+
+# 로그 및 임시 파일
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+
+# 테스트 관련
+tests/
+phpunit.xml
+.phpunit.result.cache
+
+# 개발 도구
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 문서
+docs/
+README.md
+*.md
+
+# Docker 관련
+docker-compose.yml
+docker-compose.*.yml
+!docker-compose.prod.yml
+Dockerfile.dev
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# OS 관련
+.DS_Store
+Thumbs.db
+
+# 백업 파일
+*.backup
+*.bak
+*.tmp

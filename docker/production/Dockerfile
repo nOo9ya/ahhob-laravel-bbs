@@ -1,12 +1,24 @@
-# 멀티 스테이지 빌드를 사용한 프로덕션 Dockerfile
+# ====================================
+# Stage 1: Base PHP Runtime
+# ====================================
 FROM php:8.3-fpm-alpine AS base
 
-# 시스템 의존성 설치
+# 시스템 의존성 설치 (런타임에 필요한 것만)
 RUN apk add --no-cache \
-    curl \
-    git \
-    zip \
-    unzip \
+    libpng \
+    libjpeg-turbo \
+    freetype \
+    libzip \
+    oniguruma \
+    postgresql-libs \
+    icu \
+    imagemagick \
+    supervisor \
+    nginx \
+    && rm -rf /var/cache/apk/*
+
+# PHP 확장 설치
+RUN apk add --no-cache --virtual .build-deps \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
@@ -15,8 +27,6 @@ RUN apk add --no-cache \
     postgresql-dev \
     icu-dev \
     imagemagick-dev \
-    supervisor \
-    nginx \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         bcmath \
@@ -30,10 +40,34 @@ RUN apk add --no-cache \
         pdo_pgsql \
         zip \
     && pecl install imagick redis \
-    && docker-php-ext-enable imagick redis
+    && docker-php-ext-enable imagick redis \
+    && apk del .build-deps
 
-# Composer 설치
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# ====================================
+# Stage 2: Composer Dependencies
+# ====================================
+FROM composer:2 AS composer
+
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
+
+# ====================================
+# Stage 3: Frontend Build
+# ====================================
+FROM node:20-alpine AS frontend
+
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --only=production
+
+COPY . .
+RUN npm run build
+
+# ====================================
+# Stage 4: Production Runtime
+# ====================================
+FROM base AS production
 
 # 작업 디렉토리 설정
 WORKDIR /var/www/html
@@ -45,11 +79,22 @@ COPY docker/production/php/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 # Supervisor 설정
 COPY docker/production/supervisor/ /etc/supervisor/conf.d/
 
-# 애플리케이션 파일 복사
-COPY . .
+# 애플리케이션 파일 복사 (선택적)
+COPY artisan ./
+COPY app/ ./app/
+COPY bootstrap/ ./bootstrap/
+COPY config/ ./config/
+COPY database/ ./database/
+COPY public/ ./public/
+COPY resources/ ./resources/
+COPY routes/ ./routes/
+COPY storage/ ./storage/
 
-# Composer 의존성 설치 (프로덕션 모드)
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+# Composer 의존성 복사
+COPY --from=composer /app/vendor ./vendor
+
+# 프론트엔드 빌드 결과 복사
+COPY --from=frontend /app/public/build ./public/build
 
 # 권한 설정
 RUN chown -R www-data:www-data /var/www/html \

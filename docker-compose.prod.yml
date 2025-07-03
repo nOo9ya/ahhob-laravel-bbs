@@ -79,10 +79,27 @@ services:
       - ./docker/production/nginx/conf.d:/etc/nginx/conf.d:ro
       - ./docker/production/ssl:/etc/nginx/ssl:ro
       - ./storage/logs/nginx:/var/log/nginx
+      - letsencrypt-certs:/etc/letsencrypt:ro
+      - letsencrypt-www:/var/www/certbot:ro
     depends_on:
       - app
     networks:
       - ahhob-network
+
+  # Let's Encrypt SSL 인증서
+  certbot:
+    image: certbot/certbot:latest
+    container_name: ahhob-certbot
+    volumes:
+      - letsencrypt-certs:/etc/letsencrypt
+      - letsencrypt-www:/var/www/certbot
+    command: certonly --webroot --webroot-path=/var/www/certbot --email ${SSL_EMAIL} --agree-tos --no-eff-email -d ${DOMAIN_NAME}
+    depends_on:
+      - nginx
+    networks:
+      - ahhob-network
+    profiles:
+      - ssl
 
   # MariaDB 데이터베이스
   database:
@@ -151,6 +168,10 @@ volumes:
   ahhob-redis-data:
     driver: local
   ahhob-grafana-data:
+    driver: local
+  letsencrypt-certs:
+    driver: local
+  letsencrypt-www:
     driver: local
 
 networks:
