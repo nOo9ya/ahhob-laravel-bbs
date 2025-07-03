@@ -127,6 +127,116 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        /*
+        |--------------------------------------------------------------------------
+        | Ahhob 전용 로그 채널 (Ahhob Custom Log Channels)
+        |--------------------------------------------------------------------------
+        */
+
+        'performance' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/performance.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => 30,
+            'replace_placeholders' => true,
+        ],
+
+        'activity' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/activity.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => 90,
+            'replace_placeholders' => true,
+        ],
+
+        'auth' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/auth.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => 180,
+            'replace_placeholders' => true,
+        ],
+
+        'admin' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/admin.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => 365,
+            'replace_placeholders' => true,
+        ],
+
+        'board' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/board.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => 90,
+            'replace_placeholders' => true,
+        ],
+
+        'shop' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/shop.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => 365,
+            'replace_placeholders' => true,
+        ],
+
+        'payment' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/payment.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => 2555, // 7년
+            'replace_placeholders' => true,
+        ],
+
+        'security' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/security.log'),
+            'level' => env('LOG_LEVEL', 'warning'),
+            'days' => 365,
+            'replace_placeholders' => true,
+        ],
+
+        'spam' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/spam.log'),
+            'level' => env('LOG_LEVEL', 'warning'),
+            'days' => 180,
+            'replace_placeholders' => true,
+        ],
+
+        'file_upload' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/file_upload.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => 30,
+            'replace_placeholders' => true,
+        ],
+
+        'cache' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/cache.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 7,
+            'replace_placeholders' => true,
+        ],
+
+        'queue' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/queue.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => 30,
+            'replace_placeholders' => true,
+        ],
+
+        'database' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ahhob/database.log'),
+            'level' => env('LOG_LEVEL', 'warning'),
+            'days' => 30,
+            'replace_placeholders' => true,
+        ],
+
     ],
 
 ];

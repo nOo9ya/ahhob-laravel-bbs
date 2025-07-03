@@ -34,9 +34,9 @@
                             <div class="flex items-center space-x-4">
                                 <!-- Admin Info -->
                                 <div class="text-sm text-gray-300">
-                                    <span class="font-medium text-white">{{ auth('admin')->user()->display_name }}</span>
-                                    <span class="ml-2 px-2 py-1 bg-{{ auth('admin')->user()->role->color() }}-600 text-white text-xs rounded-full">
-                                        {{ auth('admin')->user()->role->label() }}
+                                    <span class="font-medium text-white">{{ auth('admin')->user()->display_name ?? auth('admin')->user()->username }}</span>
+                                    <span class="ml-2 px-2 py-1 bg-red-600 text-white text-xs rounded-full">
+                                        관리자
                                     </span>
                                 </div>
 
@@ -114,7 +114,7 @@
                                 <div class="ml-5 w-0 flex-1">
                                     <dl>
                                         <dt class="text-sm font-medium text-gray-500 truncate">활성 사용자</dt>
-                                        <dd class="text-lg font-medium text-gray-900">{{ \App\Models\User::where('status', \App\Enums\UserStatus::ACTIVE)->count() }}명</dd>
+                                        <dd class="text-lg font-medium text-gray-900">{{ \App\Models\User::where('status', 'active')->count() }}명</dd>
                                     </dl>
                                 </div>
                             </div>
@@ -152,7 +152,7 @@
                                 <div class="ml-5 w-0 flex-1">
                                     <dl>
                                         <dt class="text-sm font-medium text-gray-500 truncate">오늘 로그인</dt>
-                                        <dd class="text-lg font-medium text-gray-900">{{ \App\Models\Ahhob\User\LoginHistory::where('status', 'success')->whereDate('created_at', today())->count() }}회</dd>
+                                        <dd class="text-lg font-medium text-gray-900">{{ \App\Models\User::whereDate('last_login_at', today())->count() }}회</dd>
                                     </dl>
                                 </div>
                             </div>
@@ -179,7 +179,7 @@
                                 </div>
                             </div>
                             <div class="mt-4">
-                                <a href="#" class="text-blue-600 hover:text-blue-500 text-sm font-medium">
+                                <a href="{{ route('admin.users.index') }}" class="text-blue-600 hover:text-blue-500 text-sm font-medium">
                                     관리하기 →
                                 </a>
                             </div>
@@ -203,7 +203,7 @@
                                 </div>
                             </div>
                             <div class="mt-4">
-                                <a href="#" class="text-green-600 hover:text-green-500 text-sm font-medium">
+                                <a href="{{ route('admin.boards.index') }}" class="text-green-600 hover:text-green-500 text-sm font-medium">
                                     관리하기 →
                                 </a>
                             </div>
@@ -316,32 +316,26 @@
                     <div class="p-6">
                         <div class="flow-root">
                             <ul class="divide-y divide-gray-200">
-                                @foreach(\App\Models\Ahhob\User\LoginHistory::latest()->limit(5)->get() as $login)
+                                @foreach(\App\Models\User::whereNotNull('last_login_at')->latest('last_login_at')->limit(5)->get() as $user)
                                 <li class="py-3">
                                     <div class="flex items-center space-x-4">
                                         <div class="flex-shrink-0">
-                                            <div class="h-8 w-8 rounded-full bg-{{ $login->is_success ? 'green' : 'red' }}-100 flex items-center justify-center">
-                                                @if($login->is_success)
-                                                    <svg class="h-4 w-4 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                @else
-                                                    <svg class="h-4 w-4 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
-                                                @endif
+                                            <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                                                <svg class="h-4 w-4 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
                                             </div>
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-medium text-gray-900 truncate">
-                                                {{ $login->is_success ? '로그인 성공' : '로그인 실패' }}
+                                                {{ $user->nickname }} 사용자 로그인
                                             </p>
                                             <p class="text-sm text-gray-500 truncate">
-                                                IP: {{ $login->ip_address }} | {{ $login->device_type }} ({{ $login->browser }})
+                                                IP: {{ $user->last_login_ip }} | {{ $user->email }}
                                             </p>
                                         </div>
                                         <div class="flex-shrink-0 text-sm text-gray-500">
-                                            {{ $login->created_at->diffForHumans() }}
+                                            {{ $user->last_login_at ? $user->last_login_at->diffForHumans() : '-' }}
                                         </div>
                                     </div>
                                 </li>

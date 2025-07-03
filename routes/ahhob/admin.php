@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Ahhob\Admin\SystemSettingController;
+use App\Http\Controllers\Ahhob\Admin\AdminDashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,20 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('admin')->name('admin.')->middleware(['web', 'auth', 'admin'])->group(function () {
+    
+    // 대시보드 (기존 dashboard.php 파일 사용)
+    require __DIR__ . '/admin/dashboard.php';
+    
+    // SEO 관리
+    Route::get('/sitemap', [AdminDashboardController::class, 'sitemap'])->name('sitemap');
+    Route::post('/sitemap/generate', [AdminDashboardController::class, 'generateSitemap'])->name('sitemap.generate');
+    Route::get('/sitemap/download', [AdminDashboardController::class, 'downloadSitemap'])->name('sitemap.download');
+    Route::delete('/sitemap', [AdminDashboardController::class, 'deleteSitemap'])->name('sitemap.delete');
+    
+    // 쇼핑몰 관리
+    Route::prefix('shop')->name('shop.')->group(function () {
+        require __DIR__ . '/admin/shop.php';
+    });
     
     // 시스템 설정 관리
     Route::prefix('settings')->name('settings.')->group(function () {

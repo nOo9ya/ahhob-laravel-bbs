@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Ahhob\Board;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -13,13 +13,15 @@ use App\Models\Ahhob\User\DailyActivityCount;
 use App\Services\Ahhob\Board\PostService;
 use App\Services\Ahhob\User\ActivityLimitService;
 
-class PostController extends Controller
+class PostController extends BaseController
 {
     public function __construct(
         private PostService $postService,
         private ActivityLimitService $activityLimitService
     ) {
-        $this->middleware('auth');
+        parent::__construct();
+        // Laravel 11에서는 middleware를 routes에서 정의하거나 직접 체크
+        // 여기서는 일단 생성자를 비워둡니다
     }
 
     /**
@@ -43,16 +45,53 @@ class PostController extends Controller
      *     @OA\Response(response="200", description="게시글 목록 조회 성공")
      * )
      */
-    public function index(Request $request, string $boardSlug): View
+    public function index(Request $request, string $boardSlug)
     {
-        $board = Board::where('slug', $boardSlug)->firstOrFail();
-        
-        // 게시판 접근 권한 확인
-        $this->authorize('view', $board);
-        
-        $posts = $this->postService->getPaginatedPosts($board, $request->all());
-        
-        return view('ahhob.board.posts.index', compact('board', 'posts'));
+        try {
+            // 1단계: 게시판 조회
+            $board = Board::where('slug', $boardSlug)->firstOrFail();
+            
+            // 임시 테스트: 가장 간단한 응답
+            if ($request->has('test')) {
+                return response('Board found: ' . $board->name, 200)
+                    ->header('Content-Type', 'text/plain');
+            }
+            
+            // 2단계: 권한 확인
+            if ($board->read_permission !== 'all' && !auth()->check()) {
+                return redirect()->route('login');
+            }
+            
+            // 3단계: 게시글 조회
+            $posts = $this->postService->getPaginatedPosts($board, $request->all());
+            
+            // 디버깅용
+            if ($request->has('debug')) {
+                dd([
+                    'board' => $board->toArray(),
+                    'posts_count' => $posts->count(),
+                    'posts' => $posts->items()
+                ]);
+            }
+            
+            // 간단한 HTML 테스트
+            if ($request->has('simple')) {
+                $html = '<h1>' . $board->name . '</h1>';
+                $html .= '<p>게시글 수: ' . $posts->count() . '</p>';
+                foreach ($posts as $post) {
+                    $authorName = $post->user ? $post->user->nickname : ($post->author_name ?? '익명');
+                    $html .= '<div><strong>' . $post->title . '</strong> - ' . $authorName . ' (' . $post->created_at->format('Y-m-d') . ')</div>';
+                }
+                return response($html)->header('Content-Type', 'text/html');
+            }
+            
+            // 4단계: 뷰 렌더링
+            return $this->themeView('boards.posts.index', compact('board', 'posts'));
+            
+        } catch (\Exception $e) {
+            return response('Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(), 500)
+                ->header('Content-Type', 'text/plain');
+        }
     }
 
     /**

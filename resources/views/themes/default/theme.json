@@ -1,0 +1,33 @@
+{
+    "name": "Default",
+    "description": "Ahhob 기본 테마 - 깔끔하고 모던한 디자인",
+    "version": "1.0.0",
+    "author": "Ahhob Team",
+    "homepage": "https://ahhob.com",
+    "preview": "/themes/default/preview.jpg",
+    "supports": {
+        "responsive": true,
+        "darkMode": false,
+        "customColors": true
+    },
+    "colors": {
+        "primary": "#3B82F6",
+        "secondary": "#6B7280",
+        "success": "#10B981",
+        "warning": "#F59E0B",
+        "danger": "#EF4444",
+        "background": "#F9FAFB",
+        "surface": "#FFFFFF",
+        "text": "#1F2937"
+    },
+    "fonts": {
+        "primary": "Noto Sans KR",
+        "secondary": "Figtree"
+    },
+    "features": [
+        "반응형 디자인",
+        "Tailwind CSS 기반",
+        "접근성 최적화",
+        "빠른 로딩 속도"
+    ]
+}

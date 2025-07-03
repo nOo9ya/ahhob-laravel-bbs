@@ -58,16 +58,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [AdminAuthController::class, 'login']);
     });
-
+    
     Route::middleware('auth:admin')->group(function () {
-        // 관리자 대시보드
-        Route::get('/dashboard', function () {
-            return view('ahhob.admin.dashboard');
-        })->name('dashboard');
-
         // 관리자 로그아웃
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
-
     });
 });
 

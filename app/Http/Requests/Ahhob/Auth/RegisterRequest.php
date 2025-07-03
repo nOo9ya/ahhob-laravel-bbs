@@ -155,7 +155,7 @@ class RegisterRequest extends FormRequest
         return [
             'username' => $validated['username'],
             'nickname' => $validated['nickname'],
-            'real_name' => $validated['real_name'],
+            'name' => $validated['real_name'], // real_name을 name으로 매핑
             'email' => $validated['email'],
             'password' => $validated['password'],
             'phone_number' => $validated['phone_number'] ?? null,

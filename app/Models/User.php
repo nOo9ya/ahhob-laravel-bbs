@@ -40,6 +40,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone_number',   // 추가 - 휴대폰
         'profile_image_path', // 추가 - 프로필 이미지
         'bio',            // 추가 - 자기소개
+        'website',        // 추가 - 개인 웹사이트
+        'location',       // 추가 - 거주지역
+        'birth_date',     // 추가 - 생년월일
+        'gender',         // 추가 - 성별
         'points',         // 추가 - 포인트
         'level',          // 추가 - 레벨
         'status',         // 추가 - 계정 상태
@@ -67,6 +71,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'status' => UserStatus::class,
             'last_login_at' => 'datetime',
+            'birth_date' => 'date',
             'points' => 'integer',
             'level' => 'integer',
         ];

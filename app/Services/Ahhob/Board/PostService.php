@@ -17,7 +17,7 @@ class PostService
     public function getPostModel(Board $board): string
     {
         $modelName = 'Board' . Str::studly($board->slug);
-        return "App\\Models\\Ahhob\\Board\\{$modelName}";
+        return "App\\Models\\Ahhob\\Board\\Dynamic\\{$modelName}";
     }
 
     /**
@@ -26,7 +26,7 @@ class PostService
     public function getCommentModel(Board $board): string
     {
         $modelName = 'Board' . Str::studly($board->slug) . 'Comment';
-        return "App\\Models\\Ahhob\\Board\\{$modelName}";
+        return "App\\Models\\Ahhob\\Board\\Dynamic\\{$modelName}";
     }
 
     /**
@@ -42,6 +42,7 @@ class PostService
         
         $query = $modelClass::query()
             ->with(['user', 'attachments'])
+            ->where('status', 'published')
             ->orderBy('is_notice', 'desc')
             ->orderBy('created_at', 'desc');
         
